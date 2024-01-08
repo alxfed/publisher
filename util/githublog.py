@@ -114,9 +114,11 @@ def read_file(repository,
 if __name__ == "__main__":
     """ Simple debug example 
     """
-    example_md_file = """# dialogue
-\nAlex: can human nature be changed?<br><br>
-\n>Machina: Yes.<br>"""
+    example_md_file = """# Topic: Can human nature be changed?
+\n<b>Alex:</b> can human nature be changed?<br>
+\n><b>Machina:</b> Yes.<br>
+\n<b>Alex:</b> How can it be done?<br>
+\n><b>Machina:</b> I don't know.<br>"""
 
     repository_object = creupdate_repo(repository_name='dialogue-with-ai',
                                        description='test repository description',
