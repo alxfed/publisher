@@ -83,7 +83,7 @@ def creupdate_file(repository,
         # Create a new file if it doesn't exist
         repository.create_file(
             path=file_path,
-            message='Create file',
+            message='Dialogue',
             content=file_content,
             branch=branch,
             committer=author,
