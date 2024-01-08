@@ -9,7 +9,7 @@ LICENSE file in the root directory of this source tree.
 from os import environ
 from json import dumps, loads
 from github import Github, InputGitAuthor, UnknownObjectException, AuthenticatedUser
-# from urllib3 import disable_warnings
+from urllib3 import disable_warnings
 
 organization    = environ.get('GITHUB_ORGANIZATION')
 github_token    = environ.get('GITHUB_TOKEN', '')
@@ -17,14 +17,13 @@ github_name     = environ.get('GITHUB_NAME', '')
 github_email    = environ.get('GITHUB_EMAIL', '')
 
 # The useless urllib3 warning is too maddening for a human being.
-# disable_warnings()
+disable_warnings()
 
 # Author
 author = InputGitAuthor(
     name=github_name,
     email=github_email
 )
-
 
 # Repo
 def creupdate_repo(repository_name,
@@ -116,9 +115,8 @@ if __name__ == "__main__":
     """ Simple debug example 
     """
     example_md_file = """# dialogue
-    
-    Alex: can human nature be changed?<br><br>
-    >Machina: Yes.<br>"""
+\nAlex: can human nature be changed?<br><br>
+\n>Machina: Yes.<br>"""
 
     repository_object = creupdate_repo(repository_name='dialogue-with-ai',
                                        description='test repository description',
