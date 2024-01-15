@@ -7,7 +7,7 @@ This source code is licensed under the license found in the
 LICENSE file in the root directory of this source tree.
 """
 from os import environ
-from json import dumps, loads
+
 from github import Github, InputGitAuthor, UnknownObjectException, AuthenticatedUser
 from urllib3 import disable_warnings
 
