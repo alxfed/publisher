@@ -1,4 +1,7 @@
 {
   "conversations_dir": "/home/.../Downloads/chat/",
-  "conversations_dir2": "/home/.../Downloads/chat2/"
+  "organization": "",
+  "repository": "",
+  "user_name": "",
+  "assistant_name": ""
 }
