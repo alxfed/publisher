@@ -6,7 +6,7 @@ This source code is licensed under the license found in the
 LICENSE file in the root directory of this source tree.
 """
 import json
-from util.recorder import save_all_records
+from  recorder import save_all_records
 
 
 def ingest_json(file_path):
@@ -71,6 +71,9 @@ def publish():
 
 
 if __name__ == '__main__':
+    with open('/home/alxfed/Documents/Adler/Reasoning.txt', 'r') as file:
+        for line in file:
+            l = line
     config = ingest_json('./util/config.json')
     conversations_list = ingest_json(f'{config["conversations_dir"]}conversations.json')
     for conv in conversations_list:
