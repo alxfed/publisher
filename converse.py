@@ -23,7 +23,7 @@ def load_agenda():
 
 
 def clean_up():
-    """ Cleans up all data.
+    """ Cleans up all objects created.
     """
     agenda = load_agenda()
     if agenda['thread_id'] != '':
@@ -54,47 +54,46 @@ def main(agenda: dict):
     """ Initiate a new conversation.
     """
     # Instantiate a conversation.
-    conv = Conversation(ai=ai, **agenda)
+    this_conversation = Conversation(ai=ai, **agenda)
 
     # Begin
-    conv.enter()
+    this_conversation.enter()
     go_on = True
 
     while go_on:
-        user_said = input(f'{conv.user_name}: ')
+        user_said = input(f'{this_conversation.user_name}: ')
         if user_said != ('stop' or 'end'):
-            new_utterance = {"author": conv.user_name,"utterance": user_said}
+            new_utterance = {"author": this_conversation.user_name,"utterance": user_said}
             try:
                 utt = Utterance(**new_utterance)
-                conv.add_utterance(utt)
-                response = conv.get_response()
-                print(f'{conv.assistant_name}: {response}')
+                this_conversation.add_utterance(utt)
+                response = this_conversation.get_response()
+                print(f'{this_conversation.assistant_name}: {response}')
             except Exception as e:
                 print(f"Error: {e}")
                 break
         elif user_said == 'stop':
-            conv.stop()
+            this_conversation.stop()
             go_on = False
             print("Conversation stopped.")
         elif user_said == 'end':
-            conv.end()
+            this_conversation.end()
             go_on = False
             print("End of conversation.")
         else:
             user_said = input('Would you like to publish this conversation? [y/n] ')
             if user_said == 'y':
-                conv.publish()
+                this_conversation.publish()
             go_on = False
             print("End of conversation")
 
 
 if __name__ == "__main__":
     user_said = input(f'Do you want to start a new conversation? [y/n/continue/restart/clean] ')
-
     if user_said == 'y':
-        agenda = clean_up()
-        delete_record(file_path=agenda['record_file'])
-        main(agenda=agenda)
+        this_agenda = clean_up()
+        delete_record(file_path=this_agenda['record_file'])
+        main(agenda=this_agenda)
     elif user_said == 'n':
         print("Not going to do anything. Goodbye!")
     elif user_said == 'continue':
@@ -102,7 +101,7 @@ if __name__ == "__main__":
     elif user_said == 'restart':
         main(agenda=load_agenda())
     elif user_said == 'clean':
-        agenda = clean_up()
-        delete_record(file_path=agenda['record_file'])
+        this_agenda = clean_up()
+        delete_record(file_path=this_agenda['record_file'])
         print("All have been cleaned up.")
     exit()
