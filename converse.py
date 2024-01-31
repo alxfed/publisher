@@ -44,6 +44,7 @@ def clean_up():
     return agenda
 
 
+
 def delete_record(file_path: str):
     """ Deletes a record of conversation."""
     if os.path.exists(file_path):

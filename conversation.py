@@ -59,21 +59,24 @@ class Conversation():
             description = self._load_assistant_description()
             try:
                 self.assistant = self.ai.beta.assistants.create(**description)
-                self.agenda['assistant_id'] = self.assistant.id
+                self.assistant_id = self.assistant.id
+                self.agenda['assistant_id'] = self.assistant_id
                 self._save_agenda()
             except Exception as e:
                 print("Unable to create assistant. ")
                 print(f"Exception: {e}")
                 return
-        # Create an initial message setting the topic of the conversation
-        topic_setter = {
-            "role": "user",
-            "content": f"{self.user_name}: The topic of this conversation will be: '{self.topic}'"
-        }
+
         if self.thread_id == '':
+            # Create an initial message setting the topic of the conversation
+            topic_setter = {
+                "role": "user",
+                "content": f"{self.user_name}: The topic of this conversation will be: '{self.topic}'"
+            }
             try:
                 self.thread = self.ai.beta.threads.create(messages=[topic_setter])
-                self.agenda['thread_id'] = self.thread.id
+                self.thread_id = self.thread.id
+                self.agenda['thread_id'] = self.thread_id
                 self._save_agenda()
             except Exception as e:
                 print("Unable to create thread. ")
@@ -96,7 +99,8 @@ class Conversation():
 
     def get_response(self):
         try:
-            self.run = self.ai.beta.threads.runs.create(thread_id=self.thread.id, assistant_id=self.assistant.id)
+            self.run = self.ai.beta.threads.runs.create(thread_id=self.thread_id, assistant_id=self.assistant_id)
+            self.run_id = self.run.id
             count = 0
         except Exception as e:
             print("Unable to create a run. ")
@@ -107,7 +111,7 @@ class Conversation():
             if count > 1:
                 sleep(2)
             # self.run_step = self.run.step
-            self.run = self.ai.beta.threads.runs.retrieve(thread_id=self.thread.id, run_id=self.run.id)
+            self.run = self.ai.beta.threads.runs.retrieve(thread_id=self.thread_id, run_id=self.run_id)
             # queued, in_progress, requires_action, cancelling, cancelled, failed, completed, or expired
             self.run_status = self.run.status
             if self.run_status == 'queued':
@@ -132,10 +136,10 @@ class Conversation():
             # if count > 200:
             #     raise RuntimeError("Run is taking too long. ")
 
-        thread_messages = self.ai.beta.threads.messages.list(thread_id=self.thread.id)
+        thread_messages = self.ai.beta.threads.messages.list(thread_id=self.thread_id)
         message_data = thread_messages.data
         new_message = message_data[0]
-        if new_message.role == 'assistant' and new_message.assistant_id == self.assistant.id:
+        if new_message.role == 'assistant' and new_message.assistant_id == self.assistant_id:
             content = new_message.content
             first_element = content[0]
             if first_element.type == 'text':
