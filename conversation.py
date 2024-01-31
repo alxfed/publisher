@@ -59,8 +59,7 @@ class Conversation():
             description = self._load_assistant_description()
             try:
                 self.assistant = self.ai.beta.assistants.create(**description)
-                self.assistant_id = self.assistant.id
-                self.agenda['assistant_id'] = self.assistant_id
+                self.agenda['assistant_id'] = self.assistant.id
                 self._save_agenda()
             except Exception as e:
                 print("Unable to create assistant. ")
@@ -74,8 +73,7 @@ class Conversation():
         if self.thread_id == '':
             try:
                 self.thread = self.ai.beta.threads.create(messages=[topic_setter])
-                self.thread_id = self.thread.id
-                self.agenda['thread_id'] = self.thread_id
+                self.agenda['thread_id'] = self.thread.id
                 self._save_agenda()
             except Exception as e:
                 print("Unable to create thread. ")
@@ -88,8 +86,7 @@ class Conversation():
             "content": f"{utterance.author}: {utterance.utterance}"
         }
         try:
-            self.message\
-                = self.ai.beta.threads.messages.create(thread_id=self.thread.id, **message_to_add)
+            self.message = self.ai.beta.threads.messages.create(thread_id=self.thread.id, **message_to_add)
         except Exception as e:
             print("Unable to add utterance. ")
             print(f"Exception: {e}")
@@ -99,7 +96,7 @@ class Conversation():
 
     def get_response(self):
         try:
-            self.run = self.ai.beta.threads.runs.create(thread_id=self.thread_id, assistant_id=self.assistant_id)
+            self.run = self.ai.beta.threads.runs.create(thread_id=self.thread.id, assistant_id=self.assistant.id)
             count = 0
         except Exception as e:
             print("Unable to create a run. ")
@@ -109,10 +106,10 @@ class Conversation():
             count += 1
             if count > 1:
                 sleep(2)
-            self.run_status = self.run.status
             # self.run_step = self.run.step
-            self.run = self.ai.beta.threads.runs.retrieve(thread_id=self.thread_id, run_id=self.run_id)
+            self.run = self.ai.beta.threads.runs.retrieve(thread_id=self.thread.id, run_id=self.run.id)
             # queued, in_progress, requires_action, cancelling, cancelled, failed, completed, or expired
+            self.run_status = self.run.status
             if self.run_status == 'queued':
                 pass
             elif self.run_status == 'in_progress':
@@ -135,13 +132,14 @@ class Conversation():
             # if count > 200:
             #     raise RuntimeError("Run is taking too long. ")
 
-        thread_messages = self.ai.beta.threads.messages.list(thread_id=self.thread_id)
-        new_message = thread_messages["data"][0]
-        if (new_message['role'] == 'assistant' and new_message['assistant_id'] == self.assistant_id):
-            content = new_message['content']
+        thread_messages = self.ai.beta.threads.messages.list(thread_id=self.thread.id)
+        message_data = thread_messages.data
+        new_message = message_data[0]
+        if new_message.role == 'assistant' and new_message.assistant_id == self.assistant.id:
+            content = new_message.content
             first_element = content[0]
-            if first_element['type'] == 'text':
-                tex = first_element['text']['value']
+            if first_element.type == 'text':
+                tex = first_element.text.value
                 utterance = Utterance(utterance=tex, author=self.assistant_name)
                 self._save_utterance(utterance)
                 self.record.append(utterance)
@@ -197,10 +195,6 @@ class Conversation():
     def _save_agenda(self):
         with open('./agenda.json', 'w') as file:
             json.dump(self.agenda, file)
-
-    def _delete_scaffolds(self):
-        # Delete thread and assistant
-        pass
 
     def next_statement(self):
         return self.record.pop(0)
