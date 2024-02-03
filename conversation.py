@@ -89,7 +89,7 @@ class Conversation():
             "content": f"{utterance.author}: {utterance.utterance}"
         }
         try:
-            self.message = self.ai.beta.threads.messages.create(thread_id=self.thread.id, **message_to_add)
+            self.message = self.ai.beta.threads.messages.create(thread_id=self.thread_id, **message_to_add)
         except Exception as e:
             print("Unable to add utterance. ")
             print(f"Exception: {e}")
@@ -203,15 +203,7 @@ class Conversation():
     def next_statement(self):
         return self.record.pop(0)
 
-    def publish(self):
-        pass
-
     def stop(self):
-        self._save_agenda()
-
-    def end(self):
-        self._delete_scaffolds()
-        # TODO: delete the ids here
         self._save_agenda()
 
 

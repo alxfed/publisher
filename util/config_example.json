@@ -1,7 +1,9 @@
 {
   "conversations_dir": "/home/.../Downloads/chat/",
+  "files_dir": "/home/.../Documents/files/",
   "organization": "",
   "repository": "",
   "user_name": "",
-  "assistant_name": ""
+  "assistant_name": "",
+  "model_name": ""
 }

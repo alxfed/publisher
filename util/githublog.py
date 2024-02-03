@@ -39,7 +39,7 @@ def creupdate_repo(repository_name,
         try:
             repo = org.get_repo(f'{repository_name}')
         except UnknownObjectException:
-            template_repo = gh.get_repo(f'multilogue/multilogue-template')
+            template_repo = gh.get_repo(f'multilogue/dialogue-template')
             repo = org.create_repo_from_template(repository_name,
                                                  template_repo,
                                                  description,
@@ -72,7 +72,7 @@ def creupdate_file(repository,
         # Update the file content
         repository.update_file(
             path=file.path,
-            message='Update file',
+            message='Dialogue with AI',
             content=file_content,
             sha=file.sha,
             branch=branch,
@@ -116,26 +116,28 @@ if __name__ == "__main__":
     """ Simple debug example 
     """
     example_md_file = """# Topic: Can human nature be changed?
-\n<b>Alex:</b> can human nature be changed?<br>
+\n\n<b>Alex:</b> Can human nature be changed?<br>
 \n><b>Machina:</b> Yes.<br>
 \n<b>Alex:</b> How can it be done?<br>
 \n><b>Machina:</b> I don't know.<br>"""
 
-    repository_object = creupdate_repo(repository_name='dialogue-with-ai',
-                                       description='test repository description',
+    organization = 'great-ideas'
+
+    repository_object = creupdate_repo(repository_name='dialogue',
+                                       description='777 lines of dialogue with an AI',
                                        private=False)
 
     try:
         result = creupdate_file(repository=repository_object,
-                                file_path='./dialogue.md',
+                                file_path='./README.md',
                                 file_content=example_md_file,
-                                branch='main')
+                                branch='second')
     except Exception as e:
         print('failed ', e)
 
     try:
         file = read_file(repository=repository_object,
-                         file_path='./dialogue.md',
+                         file_path='./README.md',
                          branch='main')
 
     except UnknownObjectException:

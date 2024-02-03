@@ -6,9 +6,10 @@ This source code is licensed under the license found in the
 LICENSE file in the root directory of this source tree.
 """
 import json
-# import jsonlines
+import jsonlines
 import os
 from conversation import Conversation, Utterance
+from util.githublog import creupdate_repo, creupdate_file
 from openai import OpenAI
 from dotenv import load_dotenv
 from typing_extensions import Literal
@@ -20,6 +21,19 @@ def load_agenda():
     with open('./agenda.json', 'r') as file:
         agenda = json.load(file)
     return agenda
+
+
+def make_md_file(agenda: dict):
+    md_text = f'# {agenda["topic"]}\n'
+    with jsonlines.open(agenda['record_file'], 'r') as reader:
+        for record in reader:
+            if record['author'] == agenda['user_name']:
+                md_text += f'\n<b>{record["author"]}:</b> {record["utterance"]}<br>'
+            elif record['author'] == agenda['assistant_name']:
+                md_text += f'\n> <b>{record["author"]}:</b> {record["utterance"]}<br>\n'
+            else:
+                print('Unexpected author')
+    return md_text
 
 
 def clean_up():
@@ -42,7 +56,6 @@ def clean_up():
     with open('./agenda.json', 'w') as file:
         json.dump(agenda, file)
     return agenda
-
 
 
 def delete_record(file_path: str):
@@ -72,7 +85,8 @@ def main(agenda: dict):
             go_on = False
             print("Conversation stopped.")
         elif user_said == 'end':
-            this_conversation.end()
+            this_conversation.stop()
+            # TODO: delete objects
             go_on = False
             print("End of conversation.")
         else:
@@ -85,14 +99,14 @@ def main(agenda: dict):
             except Exception as e:
                 print(f"Error: {e}")
                 break
-    user_said = input('Would you like to publish this conversation? [y/n] ')
-    if user_said == 'y':
-        this_conversation.publish()
+    # user_said = input('Would you like to publish this conversation? [y/n] ')
+    # if user_said == 'y':
+    #     this_conversation.publish()
     print("End of conversation")
 
 
 if __name__ == "__main__":
-    human_says = input(f'Do you want to start a new conversation? [y/n/continue/restart/clean] ')
+    human_says = input(f'Do you want to start a new conversation? [y/n/continue/restart/clean/publish] ')
     if human_says == 'y':
         this_agenda = clean_up()
         delete_record(file_path=this_agenda['record_file'])
@@ -103,6 +117,37 @@ if __name__ == "__main__":
         main(agenda=load_agenda())
     elif human_says == 'restart':
         main(agenda=load_agenda())
+    elif human_says == 'publish':
+        human_says = input('Branch name? ("Enter" for "main") ')
+        if human_says == '':
+            branch = 'main'
+        else:
+            branch = human_says
+        # Create the README.md file
+        this_agenda = load_agenda()
+        md_file = make_md_file(this_agenda)
+        # Creupdate the repository
+        with open('./util/config.json', 'r') as file:
+            configuration = json.load(file)
+        organization = configuration['organization']
+        repository_object = creupdate_repo(repository_name=configuration['repository'],
+                                           description='Dialogue with an AI',
+                                           private=False)
+        try:
+            result = creupdate_file(repository=repository_object,
+                                    file_path='./README.md',
+                                    file_content=md_file,
+                                    branch=branch)
+        except Exception as e:
+            print('failed ', e)
+        try:
+            result = creupdate_file(repository=repository_object,
+                                    file_path='./agenda.json',
+                                    file_content=json.dumps(this_agenda),
+                                    branch=branch)
+        except Exception as e:
+            print('failed ', e)
+
     elif human_says == 'clean':
         this_agenda = clean_up()
         delete_record(file_path=this_agenda['record_file'])
