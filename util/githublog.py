@@ -28,6 +28,7 @@ author = InputGitAuthor(
 
 # Repo
 def creupdate_repo(repository_name,
+                   organization=organization,
                    description=None,
                    private=False):
     """

@@ -1,1 +1,10 @@
-{"topic": "Human Nature", "user_name": "Human", "assistant_name": "machina", "assistant_id": "asst_GFjSSECTb8E03v5o0HRqyQa2", "thread_id": "thread_EwNCqnRd1sCvwPVuQiOe06DH", "run_id": "", "record_file": "./record.jsonl"}
+{
+  "topic": "How can AI/Language Models help business?",
+  "user_name": "Alex",
+  "assistant_name": "ChatGPT",
+  "other_persons": [],
+  "assistant_id": "",
+  "thread_id": "",
+  "run_id": "",
+  "record_file": "./record.jsonl"
+}
